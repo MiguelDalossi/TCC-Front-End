@@ -1,0 +1,436 @@
+body {
+  background: #f7f7f7;
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  margin: 0;
+}
+
+body.login-bg {
+  background: #eaffea !important;
+}
+
+.header {
+  background: #90ee90;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.5rem 0;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(144,238,144,0.1);
+}
+
+.header-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1 {
+  margin: 0;
+  color: #215c21;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  color: #215c21;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.nav-link:hover {
+  background: #d0ffd0;
+}
+
+.logout-btn {
+  background: #215c21;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-left: 1rem;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #157015;
+}
+
+h2 {
+  color: #215c21;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  font-size: 1.1rem;
+}
+
+.react-calendar {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(144,238,144,0.08);
+  border: 1px solid #e0e0e0;
+}
+
+.agenda-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(144,238,144,0.08);
+}
+
+.consultas-section {
+  flex: 1;
+}
+
+.consultas-list {
+  list-style: none;
+  padding: 0;
+}
+
+.consulta-item {
+  margin: 0.5rem 0;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(144,238,144,0.08);
+}
+
+.consulta-vazia {
+  background: #eee;
+  color: #888;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.calendario-section {
+  min-width: 320px;
+  background: #f7fff7;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(144,238,144,0.06);
+}
+
+.pacientes-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(144,238,144,0.08);
+  padding: 2rem;
+}
+
+.pacientes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.pacientes-header h1 {
+  font-size: 2rem;
+  color: #215c21;
+  margin: 0;
+}
+
+.novo-btn {
+  background: #215c21;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s;
+  font-size: 1rem;
+}
+
+.novo-btn:hover {
+  background: #157015;
+}
+
+.pacientes-table-wrapper {
+  overflow-x: auto;
+}
+
+.pacientes-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.pacientes-table th,
+.pacientes-table td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pacientes-table th {
+  background: #f7fff7;
+  color: #215c21;
+  font-weight: 600;
+}
+
+.editar-btn {
+  color: #215c21;
+  background: #d0ffd0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.editar-btn:hover {
+  background: #90ee90;
+}
+
+.sem-pacientes {
+  text-align: center;
+  color: #888;
+  padding: 2rem 0;
+}
+
+.paciente-form-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(144,238,144,0.08);
+  padding: 2rem;
+}
+
+.paciente-form-title {
+  font-size: 2rem;
+  color: #215c21;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.paciente-form .form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.paciente-form .form-group label {
+  font-weight: 500;
+  color: #215c21;
+  margin-bottom: 0.3rem;
+}
+
+.paciente-form input,
+.paciente-form textarea {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-size: 1rem;
+  background: #f7fff7;
+  transition: border 0.2s;
+}
+
+.paciente-form input:focus,
+.paciente-form textarea:focus {
+  border-color: #90ee90;
+  outline: none;
+}
+
+.paciente-form .form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.paciente-form .form-row .form-group {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-salvar {
+  background: #215c21;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-salvar:hover:enabled {
+  background: #157015;
+}
+
+.btn-cancelar {
+  background: #e0e0e0;
+  color: #215c21;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-cancelar:hover {
+  background: #d0ffd0;
+}
+
+.btn-excluir {
+  background: #fff;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-left: auto;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-excluir:hover:enabled {
+  background: #ffd0d0;
+  color: #a00;
+}
+
+.login-container {
+  max-width: 400px;
+  margin: 6rem auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(144,238,144,0.15);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-title {
+  font-size: 1.7rem;
+  color: #215c21;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #215c21;
+}
+
+.form-input {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-size: 1rem;
+  background: #f7fff7;
+  transition: border 0.2s;
+}
+
+.form-input:focus {
+  border-color: #90ee90;
+  outline: none;
+}
+
+.btn-salvar {
+  background: #215c21;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.btn-salvar:hover:enabled {
+  background: #157015;
+}
+
+.text-red-600 {
+  color: #d32f2f;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .pacientes-container {
+    padding: 1rem;
+  }
+  .pacientes-header h1 {
+    font-size: 1.3rem;
+  }
+  .novo-btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+  .paciente-form-container {
+    padding: 1rem;
+  }
+  .paciente-form-title {
+    font-size: 1.3rem;
+  }
+  .paciente-form .form-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .login-container {
+    padding: 1rem;
+    margin: 2rem auto;
+  }
+  .login-title {
+    font-size: 1.2rem;
+  }
+}

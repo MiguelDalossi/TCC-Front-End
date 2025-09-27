@@ -16,7 +16,11 @@ import PacienteForm from "../pages/pacientes/PacienteForm";
 import ConsultasList from "../pages/consultas/ConsultasList";
 import ConsultaForm from "../pages/consultas/ConsultaForm";
 import ConsultaDetalhe from "../pages/consultas/ConsultaDetalhe";
+import AgendaMedica from "../pages/AgendaMedica";
 
+// Médicos
+import MedicosList from "../pages/medicos/MedicosList";
+import MedicoForm from "../pages/medicos/MedicoForm";
 
 
 
@@ -35,7 +39,7 @@ export default function AppRoutes() {
         {/* Privado */}
         <Route element={<Protected />}>
           <Route element={<Shell />}>
-            <Route index element={<Dashboard />} />
+            <Route index element={<AgendaMedica />} /> {/* <-- Troque Dashboard por AgendaMedica */}
 
             {/* Pacientes */}
             <Route path="pacientes" element={<PacientesList />} />
@@ -46,6 +50,11 @@ export default function AppRoutes() {
             <Route path="consultas" element={<ConsultasList />} />
             <Route path="consultas/nova" element={<ConsultaForm />} />
             <Route path="consultas/:id" element={<ConsultaDetalhe />} />
+
+            {/* Médicos */}
+            <Route path="medicos" element={<MedicosList />} />
+            <Route path="medicos/novo" element={<MedicoForm />} />
+            <Route path="medicos/:id/editar" element={<MedicoForm />} />
           </Route>
         </Route>
 

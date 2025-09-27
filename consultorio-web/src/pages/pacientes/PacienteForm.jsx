@@ -7,7 +7,7 @@ import {
   atualizarPaciente,
   excluirPaciente,
 } from "../../service/paciente";
-import Loader from "../../components/Loader"; // ⬅️ importa o loader
+import Loader from "../../components/Loader";
 
 export default function PacienteForm() {
   const { id } = useParams();
@@ -15,14 +15,12 @@ export default function PacienteForm() {
   const nav = useNavigate();
   const qc = useQueryClient();
 
-  // Carrega dados do paciente se for edição
   const { data: existente, isLoading: carregandoExistente, isError: erroExistente } = useQuery({
     queryKey: ["paciente", id],
     queryFn: () => buscarPaciente(id),
     enabled: isEdit,
   });
 
-  // estado do formulário
   const [form, setForm] = React.useState({
     nome: "",
     dataNascimento: "",
@@ -33,12 +31,11 @@ export default function PacienteForm() {
     observacoes: "",
   });
 
-  // sincroniza estado quando carregar o existente
   React.useEffect(() => {
     if (!existente) return;
     setForm({
       nome: existente.nome || "",
-      dataNascimento: toDateInput(existente.dataNascimento), // 'YYYY-MM-DD'
+      dataNascimento: toDateInput(existente.dataNascimento),
       cpf: existente.cpf || "",
       telefone: existente.telefone || "",
       email: existente.email || "",
@@ -79,132 +76,123 @@ export default function PacienteForm() {
     }
   }
 
-  // ⬇️ Loader enquanto carrega o paciente no modo edição
   if (isEdit && carregandoExistente) return <Loader message="Carregando paciente..." />;
-
-  // (opcional) Tratativa de erro ao carregar paciente
   if (isEdit && erroExistente) {
     return <div className="text-red-600">Erro ao carregar os dados do paciente.</div>;
   }
 
   return (
-    <form onSubmit={submit} className="max-w-xl space-y-3">
-      <h1 className="text-xl font-semibold">{isEdit ? "Editar" : "Novo"} Paciente</h1>
+    <div className="paciente-form-container">
+      <form onSubmit={submit} className="paciente-form">
+        <h1 className="paciente-form-title">{isEdit ? "Editar" : "Novo"} Paciente</h1>
 
-      <div>
-        <label className="block text-sm mb-1">Nome *</label>
-        <input
-          name="nome"
-          value={form.nome}
-          onChange={onChange}
-          className="w-full border rounded p-2"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Data de Nascimento *</label>
-        <input
-          type="date"
-          name="dataNascimento"
-          value={form.dataNascimento}
-          onChange={onChange}
-          className="w-full border rounded p-2"
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-3 gap-3">
-        <div>
-          <label className="block text-sm mb-1">CPF</label>
+        <div className="form-group">
+          <label>Nome *</label>
           <input
-            name="cpf"
-            value={form.cpf}
+            name="nome"
+            value={form.nome}
             onChange={onChange}
-            className="w-full border rounded p-2"
-            placeholder="000.000.000-00"
+            required
           />
         </div>
-        <div>
-          <label className="block text-sm mb-1">Telefone</label>
+
+        <div className="form-group">
+          <label>Data de Nascimento *</label>
           <input
-            name="telefone"
-            value={form.telefone}
+            type="date"
+            name="dataNascimento"
+            value={form.dataNascimento}
             onChange={onChange}
-            className="w-full border rounded p-2"
-            placeholder="(00) 00000-0000"
+            required
           />
         </div>
-        <div>
-          <label className="block text-sm mb-1">Email</label>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>CPF</label>
+            <input
+              name="cpf"
+              value={form.cpf}
+              onChange={onChange}
+              placeholder="000.000.000-00"
+            />
+          </div>
+          <div className="form-group">
+            <label>Telefone</label>
+            <input
+              name="telefone"
+              value={form.telefone}
+              onChange={onChange}
+              placeholder="(00) 00000-0000"
+            />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={onChange}
+              placeholder="exemplo@dominio.com"
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Endereço</label>
           <input
-            type="email"
-            name="email"
-            value={form.email}
+            name="endereco"
+            value={form.endereco}
             onChange={onChange}
-            className="w-full border rounded p-2"
-            placeholder="exemplo@dominio.com"
           />
         </div>
-      </div>
 
-      <div>
-        <label className="block text-sm mb-1">Endereço</label>
-        <input
-          name="endereco"
-          value={form.endereco}
-          onChange={onChange}
-          className="w-full border rounded p-2"
-        />
-      </div>
+        <div className="form-group">
+          <label>Observações</label>
+          <textarea
+            name="observacoes"
+            value={form.observacoes}
+            onChange={onChange}
+            rows={3}
+          />
+        </div>
 
-      <div>
-        <label className="block text-sm mb-1">Observações</label>
-        <textarea
-          name="observacoes"
-          value={form.observacoes}
-          onChange={onChange}
-          className="w-full border rounded p-2"
-          rows={3}
-        />
-      </div>
+        <div className="form-actions">
+          <button
+            className="btn-salvar"
+            disabled={mutSave.isPending}
+          >
+            {mutSave.isPending ? "Salvando..." : "Salvar"}
+          </button>
 
-      <div className="flex gap-2">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          disabled={mutSave.isPending}
-        >
-          {mutSave.isPending ? "Salvando..." : "Salvar"}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => history.back()}
-          className="px-4 py-2 border rounded"
-        >
-          Cancelar
-        </button>
-
-        {isEdit && (
           <button
             type="button"
-            onClick={onDelete}
-            className="ml-auto px-4 py-2 border rounded text-red-600 border-red-600"
-            disabled={mutDelete.isPending}
+            onClick={() => nav("/pacientes")}
+            className="btn-cancelar"
           >
-            {mutDelete.isPending ? "Excluindo..." : "Excluir"}
+            Cancelar
           </button>
-        )}
-      </div>
 
-      {(mutSave.isError || mutDelete.isError) && (
-        <p className="text-red-600 text-sm">Ocorreu um erro. Tente novamente.</p>
-      )}
-    </form>
+          {isEdit && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="btn-excluir"
+              disabled={mutDelete.isPending}
+            >
+              {mutDelete.isPending ? "Excluindo..." : "Excluir"}
+            </button>
+          )}
+        </div>
+
+        {(mutSave.isError || mutDelete.isError) && (
+          <p className="text-red-600 text-sm">Ocorreu um erro. Tente novamente.</p>
+        )}
+      </form>
+    </div>
   );
 }
 
-/* util: ISO → 'YYYY-MM-DD' para <input type="date"> */
 function toDateInput(iso) {
   if (!iso) return "";
   try {

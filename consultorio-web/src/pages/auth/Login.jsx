@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import { login } from "../../service/auth.js";
@@ -21,49 +21,63 @@ export default function Login() {
     onSuccess: () => nav(from, { replace: true }),
   });
 
+  useEffect(() => {
+    document.body.classList.add("login-bg");
+    return () => document.body.classList.remove("login-bg");
+  }, []);
+
   if (mut.isPending) return <Loader message="Entrando..." />;
 
   return (
-    <div className="max-w-sm mx-auto mt-20 border rounded p-6 space-y-4">
-      <h1 className="text-xl font-semibold">Acessar</h1>
-
+    <div className="login-container">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           mut.mutate();
         }}
-        className="space-y-3"
+        className="login-form"
+        aria-label="Formulário de login"
       >
-        <div>
-          <label className="block text-sm mb-1">E-mail</label>
+        <h1 className="login-title">Acessar o Consultório Médico</h1>
+
+        <div className="form-group">
+          <label htmlFor="email" className="form-label">
+            E-mail
+          </label>
           <input
+            id="email"
             type="email"
             name="email"
+            autoComplete="username"
             value={form.email}
             onChange={onChange}
-            className="w-full border rounded p-2"
+            className="form-input"
             required
           />
         </div>
 
-        <div>
-          <label className="block text-sm mb-1">Senha</label>
+        <div className="form-group">
+          <label htmlFor="password" className="form-label">
+            Senha
+          </label>
           <input
+            id="password"
             type="password"
             name="password"
+            autoComplete="current-password"
             value={form.password}
             onChange={onChange}
-            className="w-full border rounded p-2"
+            className="form-input"
             required
           />
         </div>
 
-        <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">
+        <button className="btn-salvar" type="submit">
           Entrar
         </button>
 
         {mut.isError && (
-          <p className="text-red-600 text-sm">
+          <p className="text-red-600 text-sm" role="alert">
             Falha no login. Verifique e-mail e senha.
           </p>
         )}
