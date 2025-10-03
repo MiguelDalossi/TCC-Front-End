@@ -2,7 +2,11 @@ import api from "./api";
 
 // Lista todos os médicos
 export function listarMedicos() {
-  return api.get("/medicos").then(res => res.data);
+  return api.get("/medicos").then(res => {
+    if (Array.isArray(res.data)) return res.data;
+    if (Array.isArray(res.data.itens)) return res.data.itens; // <-- CORRETO
+    return [];
+  });
 }
 
 // Busca médico por ID

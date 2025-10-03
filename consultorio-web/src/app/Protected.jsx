@@ -79,13 +79,9 @@ export default function Protected({ roles }) {
   const token = getToken();
 
   // Sem token → manda pro login
-  /*if (!token) {
+  if (!token) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
-  }*/
-
-    if (!token) {
-  console.warn("Sem token, mas permitindo acesso para testes.");
-}
+  }
 
   // Token expirado → limpa e manda pro login
   if (isExpired(token)) {

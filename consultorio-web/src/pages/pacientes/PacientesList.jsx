@@ -29,6 +29,8 @@ export default function PacientesList() {
               <th>Nome</th>
               <th>Telefone</th>
               <th>Nascimento</th>
+              <th>Cidade</th>
+              <th>Estado</th>
               <th className="text-right">Ações</th>
             </tr>
           </thead>
@@ -42,6 +44,8 @@ export default function PacientesList() {
                     ? new Date(p.dataNascimento).toLocaleDateString()
                     : "-"}
                 </td>
+                <td>{p.cidade || "-"}</td>
+                <td>{p.estado || "-"}</td>
                 <td className="text-right">
                   <Link
                     to={`/pacientes/${p.id}/editar`}
@@ -49,12 +53,19 @@ export default function PacientesList() {
                   >
                     Editar
                   </Link>
+                  <Link
+                    to={`/pacientes/${p.id}/detalhes`}
+                    className="detalhes-btn"
+                    style={{ marginLeft: 8 }}
+                  >
+                    Detalhes
+                  </Link>
                 </td>
               </tr>
             ))}
             {data?.length === 0 && (
               <tr>
-                <td colSpan={4} className="sem-pacientes">
+                <td colSpan={6} className="sem-pacientes">
                   Nenhum paciente cadastrado.
                 </td>
               </tr>

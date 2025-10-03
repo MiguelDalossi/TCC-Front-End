@@ -4,11 +4,9 @@ import api from "./api";
 /** Normaliza datas (Date | 'YYYY-MM-DD' | 'YYYY-MM-DDTHH:mm' → ISO) */
 function toIso(dt) {
   if (!dt) return null;
-  // "2025-10-31T14:30" (input type="datetime-local") → ISO
   if (typeof dt === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dt)) {
     return new Date(dt).toISOString();
   }
-  // "2025-10-31" → meia-noite local em ISO
   if (typeof dt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dt)) {
     return new Date(dt + "T00:00:00").toISOString();
   }
@@ -44,7 +42,8 @@ export async function criarConsulta({ pacienteId, medicoId, inicio, fim }) {
 
 /** PATCH /api/consultas/{id}/status → { status } (Agendada|EmAndamento|Concluida|Cancelada) */
 export async function atualizarStatus(id, status) {
-  return api.patch(`/consultas/${id}/status`, { status });
+  // status deve ser: "Agendada", "EmAndamento", "Concluida", "Cancelada"
+  return api.patch(`/consultas/${id}/status`, { Status: status });
 }
 
 /** PUT /api/consultas/{id}/horario → { inicio, fim } */

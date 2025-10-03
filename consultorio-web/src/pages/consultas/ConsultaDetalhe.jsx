@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../../components/Loader";
-
 import {
   obterConsulta,
   atualizarStatus,
@@ -14,7 +13,12 @@ import {
   obterPrescricaoPdfUrl,
 } from "../../service/prescricoes.js";
 
-const STATUS_OPTS = ["Agendada", "EmAndamento", "Concluida", "Cancelada"];
+const STATUS_OPTS = [
+  { value: "Agendada", label: "🗓️ Agendada" },
+  { value: "EmAndamento", label: "⏳ Em andamento" },
+  { value: "Concluida", label: "✅ Concluída" },
+  { value: "Cancelada", label: "❌ Cancelada" },
+];
 
 export default function ConsultaDetalhe() {
   const { id } = useParams();
@@ -26,13 +30,8 @@ export default function ConsultaDetalhe() {
     enabled: !!id,
   });
 
-  // estado local (espelha dados atuais; ao salvar, recarrega via invalidate)
-  const [status, setStatus] = useState(STATUS_OPTS[0]);
-
-  const [horario, setHorario] = useState({
-    inicio: "",
-    fim: "",
-  });
+  const [status, setStatus] = useState(STATUS_OPTS[0].value);
+  const [horario, setHorario] = useState({ inicio: "", fim: "" });
 
   const prontInicial = useMemo(
     () => ({
@@ -45,41 +44,37 @@ export default function ConsultaDetalhe() {
     }),
     [data]
   );
-
   const [pront, setPront] = useState(prontInicial);
 
   const [itensRx, setItensRx] = useState(
-    data?.prescricoes?.length ? data.prescricoes : [{ medicamento: "", posologia: "", orientacoes: "" }]
+    data?.prescricoes?.length
+      ? data.prescricoes
+      : [{ medicamento: "", posologia: "", orientacoes: "" }]
   );
 
-  // Atualizar status
   const mutStatus = useMutation({
     mutationFn: () => atualizarStatus(id, status),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
-  // Atualizar horário (opcional, se seu back tiver esse endpoint)
   const mutHorario = useMutation({
     mutationFn: () => atualizarHorario(id, horario),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
-  // Upsert prontuário
   const mutPront = useMutation({
     mutationFn: () => upsertProntuario(id, pront),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
-  // Upsert prescrições
   const mutRx = useMutation({
     mutationFn: () => upsertPrescricoes(id, itensRx),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
-  // Sempre que os dados carregarem, sincroniza estados locais
   React.useEffect(() => {
     if (!data) return;
-    setStatus(data.status || STATUS_OPTS[0]);
+    setStatus(data.status || STATUS_OPTS[0].value);
     setHorario({
       inicio: data.inicio ? toLocalInput(data.inicio) : "",
       fim: data.fim ? toLocalInput(data.fim) : "",
@@ -93,117 +88,115 @@ export default function ConsultaDetalhe() {
   }, [data, prontInicial]);
 
   if (isLoading) return <Loader message="Carregando consulta..." />;
-  if (isError || !data) return <div className="text-red-600">Erro ao carregar consulta.</div>;
+  if (isError || !data)
+    return <div className="text-red-600">Erro ao carregar consulta.</div>;
 
   return (
-    <div className="space-y-8">
-      {/* Cabeçalho */}
-      <header className="space-y-1">
-        <h1 className="text-xl font-semibold">Consulta</h1>
-        <p className="text-sm text-gray-600">
-          Paciente: <strong>{data.pacienteNome}</strong> · Médico:{" "}
-          <strong>{data.medicoNome}</strong>
-        </p>
+    <div className="consulta-edit-container">
+      <header className="consulta-header">
+        <h1>Editar Consulta</h1>
+        <div className="consulta-info">
+          <span><strong>Paciente:</strong> {data.pacienteNome}</span>
+          <span><strong>Médico:</strong> {data.medicoNome}</span>
+        </div>
       </header>
 
-      {/* Status e Horário */}
-      <section className="space-y-3">
-        <h2 className="font-semibold">Status & Horário</h2>
-
-        <div className="flex items-center gap-2">
+      {/* Status & Horário */}
+      <section className="consulta-card">
+        <h2>🗓️ Status & Horário</h2>
+        <div className="consulta-status-row">
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="border rounded p-1"
+            className="consulta-select"
           >
             {STATUS_OPTS.map((s) => (
-              <option key={s} value={s}>
-                {s}
+              <option key={s.value} value={s.value}>
+                {s.label}
               </option>
             ))}
           </select>
           <button
             onClick={() => mutStatus.mutate()}
-            className="px-3 py-1 bg-blue-600 text-white rounded"
+            className="btn-salvar"
             disabled={mutStatus.isPending}
           >
             {mutStatus.isPending ? "Atualizando..." : "Atualizar status"}
           </button>
         </div>
-
-        <div className="grid grid-cols-2 gap-3 max-w-xl">
+        <div className="consulta-horario-row">
           <div>
-            <label className="block text-sm mb-1">Início</label>
+            <label>Início</label>
             <input
               type="datetime-local"
               value={horario.inicio}
               onChange={(e) =>
                 setHorario((v) => ({ ...v, inicio: e.target.value }))
               }
-              className="w-full border rounded p-2"
+              className="consulta-input"
             />
           </div>
           <div>
-            <label className="block text-sm mb-1">Fim</label>
+            <label>Fim</label>
             <input
               type="datetime-local"
               value={horario.fim}
               onChange={(e) =>
                 setHorario((v) => ({ ...v, fim: e.target.value }))
               }
-              className="w-full border rounded p-2"
+              className="consulta-input"
             />
           </div>
+          <button
+            onClick={() => mutHorario.mutate()}
+            className="btn-salvar"
+            disabled={mutHorario.isPending}
+            style={{ marginLeft: "1rem" }}
+          >
+            {mutHorario.isPending ? "Salvando..." : "Salvar horário"}
+          </button>
         </div>
-
-        <button
-          onClick={() => mutHorario.mutate()}
-          className="px-3 py-1 border rounded"
-          disabled={mutHorario.isPending}
-        >
-          {mutHorario.isPending ? "Salvando..." : "Salvar horário"}
-        </button>
+        {mutStatus.isError && <div className="text-red-600">Erro ao salvar status</div>}
+        {mutHorario.isError && <div className="text-red-600">Erro ao salvar horário</div>}
       </section>
 
       {/* Prontuário */}
-      <section className="space-y-3">
-        <h2 className="font-semibold">Prontuário</h2>
+      <section className="consulta-card">
+        <h2>📋 Prontuário</h2>
         <ProntuarioForm pront={pront} setPront={setPront} />
         <button
           onClick={() => mutPront.mutate()}
-          className="px-3 py-1 bg-blue-600 text-white rounded"
+          className="btn-salvar"
           disabled={mutPront.isPending}
         >
           {mutPront.isPending ? "Salvando..." : "Salvar prontuário"}
         </button>
+        {mutPront.isError && <div className="text-red-600">Erro ao salvar prontuário</div>}
       </section>
 
       {/* Prescrição */}
-      <section className="space-y-3">
-        <h2 className="font-semibold">Prescrição</h2>
+      <section className="consulta-card">
+        <h2>💊 Prescrição</h2>
         <PrescricaoForm itens={itensRx} setItens={setItensRx} />
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => mutRx.mutate()}
-            className="px-3 py-1 bg-blue-600 text-white rounded"
-            disabled={mutRx.isPending}
-          >
-            {mutRx.isPending ? "Salvando..." : "Salvar prescrição"}
-          </button>
-        </div>
-
-        {/* Se o back retornar IDs das prescrições, podemos exibir links de PDF */}
+        <button
+          onClick={() => mutRx.mutate()}
+          className="btn-salvar"
+          disabled={mutRx.isPending}
+        >
+          {mutRx.isPending ? "Salvando..." : "Salvar prescrição"}
+        </button>
+        {mutRx.isError && <div className="text-red-600">Erro ao salvar prescrição</div>}
         {!!data.prescricoes?.length && (
-          <div className="pt-2 text-sm">
+          <div className="prescricao-pdfs">
             {data.prescricoes.map((rx, i) => (
-              <div key={rx.id || i} className="flex items-center justify-between border-b py-1">
+              <div key={rx.id || i} className="prescricao-pdf-row">
                 <span>
                   <strong>{rx.medicamento}</strong> — {rx.posologia}
                   {rx.orientacoes ? ` · ${rx.orientacoes}` : ""}
                 </span>
                 {rx.id ? (
                   <a
-                    className="text-blue-600"
+                    className="pdf-link"
                     href={obterPrescricaoPdfUrl(rx.id)}
                     target="_blank"
                     rel="noreferrer"
@@ -219,8 +212,6 @@ export default function ConsultaDetalhe() {
     </div>
   );
 }
-
-/* ----------------- componentes auxiliares ----------------- */
 
 function ProntuarioForm({ pront, setPront }) {
   function onChange(e) {

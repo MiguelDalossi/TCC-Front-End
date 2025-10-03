@@ -11,6 +11,7 @@ import Dashboard from "../pages/Dashboard";
 // Pacientes  
 import PacientesList from "../pages/pacientes/PacientesList";
 import PacienteForm from "../pages/pacientes/PacienteForm";
+import PacienteDetails from "../pages/pacientes/PacienteDetails";
 
 // Consultas
 import ConsultasList from "../pages/consultas/ConsultasList";
@@ -21,6 +22,10 @@ import AgendaMedica from "../pages/AgendaMedica";
 // Médicos
 import MedicosList from "../pages/medicos/MedicosList";
 import MedicoForm from "../pages/medicos/MedicoForm";
+import MedicoDetails from "../pages/medicos/MedicoDetails";
+
+// Usuário
+import MePage from "../pages/auth/MePage";
 
 
 
@@ -45,6 +50,7 @@ export default function AppRoutes() {
             <Route path="pacientes" element={<PacientesList />} />
             <Route path="pacientes/novo" element={<PacienteForm />} />
             <Route path="pacientes/:id/editar" element={<PacienteForm />} />
+            <Route path="/pacientes/:id/detalhes" element={<PacienteDetails />} />
 
             {/* Consultas */}
             <Route path="consultas" element={<ConsultasList />} />
@@ -55,6 +61,10 @@ export default function AppRoutes() {
             <Route path="medicos" element={<MedicosList />} />
             <Route path="medicos/novo" element={<MedicoForm />} />
             <Route path="medicos/:id/editar" element={<MedicoForm />} />
+            <Route path="/medicos/:id/detalhes" element={<MedicoDetails />} />
+
+            {/* Usuário */}
+            <Route path="/me" element={<MePage />} />
           </Route>
         </Route>
 

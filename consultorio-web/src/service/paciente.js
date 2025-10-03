@@ -35,8 +35,14 @@ export async function criarPaciente(form) {
     cpf: form.cpf || null,
     telefone: form.telefone || null,
     email: form.email || null,
-    endereco: form.endereco || null,
     observacoes: form.observacoes || null,
+    cidade: form.cidade || null,
+    estado: form.estado || null,
+    bairro: form.bairro || null,
+    rua: form.rua || null,
+    numero: form.numero || null,
+    cep: form.cep || null,
+    complemento: form.complemento || null,
   };
   return api.post("/pacientes", payload);
 }
@@ -49,8 +55,14 @@ export async function atualizarPaciente(id, form) {
     cpf: form.cpf || null,
     telefone: form.telefone || null,
     email: form.email || null,
-    endereco: form.endereco || null,
     observacoes: form.observacoes || null,
+    cidade: form.cidade || null,
+    estado: form.estado || null,
+    bairro: form.bairro || null,
+    rua: form.rua || null,
+    numero: form.numero || null,
+    cep: form.cep || null,
+    complemento: form.complemento || null,
   };
   return api.put(`/pacientes/${id}`, payload);
 }

@@ -7,6 +7,7 @@ import {
   atualizarPaciente,
   excluirPaciente,
 } from "../../service/paciente";
+import { buscarEnderecoPorCep } from "../../service/viacep";
 import Loader from "../../components/Loader";
 
 export default function PacienteForm() {
@@ -27,8 +28,14 @@ export default function PacienteForm() {
     cpf: "",
     telefone: "",
     email: "",
-    endereco: "",
     observacoes: "",
+    cidade: "",
+    estado: "",
+    bairro: "",
+    rua: "",
+    numero: "",
+    cep: "",
+    complemento: "",
   });
 
   React.useEffect(() => {
@@ -39,10 +46,35 @@ export default function PacienteForm() {
       cpf: existente.cpf || "",
       telefone: existente.telefone || "",
       email: existente.email || "",
-      endereco: existente.endereco || "",
       observacoes: existente.observacoes || "",
+      cidade: existente.cidade || "",
+      estado: existente.estado || "",
+      bairro: existente.bairro || "",
+      rua: existente.rua || "",
+      numero: existente.numero || "",
+      cep: existente.cep || "",
+      complemento: existente.complemento || "",
     });
   }, [existente]);
+
+  // Busca endereço ao digitar o CEP
+  React.useEffect(() => {
+    const cepLimpo = form.cep.replace(/\D/g, "");
+    if (cepLimpo.length === 8) {
+      buscarEnderecoPorCep(form.cep).then((endereco) => {
+        if (endereco) {
+          setForm((f) => ({
+            ...f,
+            rua: endereco.rua,
+            bairro: endereco.bairro,
+            cidade: endereco.cidade,
+            estado: endereco.estado,
+            complemento: endereco.complemento,
+          }));
+        }
+      });
+    }
+  }, [form.cep]);
 
   function onChange(e) {
     const { name, value } = e.target;
@@ -139,15 +171,6 @@ export default function PacienteForm() {
         </div>
 
         <div className="form-group">
-          <label>Endereço</label>
-          <input
-            name="endereco"
-            value={form.endereco}
-            onChange={onChange}
-          />
-        </div>
-
-        <div className="form-group">
           <label>Observações</label>
           <textarea
             name="observacoes"
@@ -155,6 +178,66 @@ export default function PacienteForm() {
             onChange={onChange}
             rows={3}
           />
+        </div>
+
+        <div className="form-group">
+          <label>Cidade</label>
+          <input
+            name="cidade"
+            value={form.cidade}
+            onChange={onChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Estado</label>
+          <input
+            name="estado"
+            value={form.estado}
+            onChange={onChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Bairro</label>
+          <input
+            name="bairro"
+            value={form.bairro}
+            onChange={onChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Rua</label>
+          <input
+            name="rua"
+            value={form.rua}
+            onChange={onChange}
+          />
+        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Número</label>
+            <input
+              name="numero"
+              value={form.numero}
+              onChange={onChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>CEP</label>
+            <input
+              name="cep"
+              value={form.cep}
+              onChange={onChange}
+              placeholder="00000-000"
+            />
+          </div>
+          <div className="form-group">
+            <label>Complemento</label>
+            <input
+              name="complemento"
+              value={form.complemento}
+              onChange={onChange}
+            />
+          </div>
         </div>
 
         <div className="form-actions">

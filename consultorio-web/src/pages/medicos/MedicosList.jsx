@@ -13,6 +13,8 @@ export default function MedicosList() {
   if (isLoading) return <Loader message="Carregando médicos..." />;
   if (isError) return <div className="text-red-600">Erro ao carregar médicos.</div>;
 
+  const listaMedicos = Array.isArray(data) ? data : [];
+
   return (
     <div className="pacientes-container">
       <div className="pacientes-header">
@@ -26,17 +28,23 @@ export default function MedicosList() {
           <thead>
             <tr>
               <th>Nome</th>
+              <th>CRM</th>
+              <th>UF</th>
               <th>Especialidade</th>
-              <th>Telefone</th>
+              <th>CPF</th>
+              <th>Email</th>
               <th className="text-right">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {(data || []).map((m) => (
+            {listaMedicos.map((m) => (
               <tr key={m.id}>
-                <td>{m.nome}</td>
+                <td>{m.nome || m.fullName}</td>
+                <td>{m.crm}</td>
+                <td>{m.uf}</td>
                 <td>{m.especialidade}</td>
-                <td>{m.telefone || "-"}</td>
+                <td>{m.cpf}</td>
+                <td>{m.email}</td>
                 <td className="text-right">
                   <Link
                     to={`/medicos/${m.id}/editar`}
@@ -44,12 +52,19 @@ export default function MedicosList() {
                   >
                     Editar
                   </Link>
+                  <Link
+                    to={`/medicos/${m.id}/detalhes`}
+                    className="detalhes-btn"
+                    style={{ marginLeft: 8 }}
+                  >
+                    Detalhes
+                  </Link>
                 </td>
               </tr>
             ))}
-            {data?.length === 0 && (
+            {listaMedicos.length === 0 && (
               <tr>
-                <td colSpan={4} className="sem-pacientes">
+                <td colSpan={7} className="sem-pacientes">
                   Nenhum médico cadastrado.
                 </td>
               </tr>

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listarPacientes } from "../service/paciente";
 import { listarConsultas } from "../service/consultas";
 import Loader from "../components/Loader";
+import { getCurrentUser } from "../service/auth";
 
 export default function Dashboard() {
   const { data: pacientes, isLoading: loadingPac, isError: errPac } = useQuery({
@@ -16,31 +17,40 @@ export default function Dashboard() {
     queryFn: listarConsultas,
   });
 
+  const user = getCurrentUser();
+
+  const consultasFiltradas = useMemo(() => {
+    if (!consultas) return [];
+    if (user?.role === "Medico") {
+      return consultas.filter((c) => c.medicoNome === user.fullName);
+    }
+    return consultas;
+  }, [consultas, user]);
+
   const proxConsultas = useMemo(() => {
-    if (!consultas?.length) return [];
-    // ordena por inicio asc e pega as 5 mais próximas a partir de agora
+    if (!consultasFiltradas?.length) return [];
     const now = new Date();
-    return [...consultas]
+    return [...consultasFiltradas]
       .filter((c) => (c.inicio ? new Date(c.inicio) >= now : true))
       .sort((a, b) => new Date(a.inicio) - new Date(b.inicio))
       .slice(0, 5);
-  }, [consultas]);
+  }, [consultasFiltradas]);
 
   const totalPacientes = pacientes?.length || 0;
   const totalConsultasHoje = useMemo(() => {
-    if (!consultas?.length) return 0;
+    if (!consultasFiltradas?.length) return 0;
     const hoje = new Date();
     const yyyy = hoje.getFullYear();
     const mm = hoje.getMonth();
     const dd = hoje.getDate();
-    return consultas.filter((c) => {
+    return consultasFiltradas.filter((c) => {
       if (!c.inicio) return false;
       const d = new Date(c.inicio);
       return d.getFullYear() === yyyy && d.getMonth() === mm && d.getDate() === dd;
     }).length;
-  }, [consultas]);
+  }, [consultasFiltradas]);
 
-  const emAndamento = consultas?.filter((c) => c.status === "EmAndamento").length || 0;
+  const emAndamento = consultasFiltradas?.filter((c) => c.status === "EmAndamento").length || 0;
 
   return (
     <div className="space-y-6">

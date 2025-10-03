@@ -256,7 +256,7 @@ li {
 }
 
 .paciente-form .form-row {
-  display: flex;
+  display: grid;
   gap: 1rem;
 }
 
@@ -388,6 +388,99 @@ li {
   color: #d32f2f;
   text-align: center;
   margin-top: 0.5rem;
+}
+
+.consulta-edit-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(144,238,144,0.10);
+  padding: 2rem;
+}
+
+.consulta-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.consulta-info {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 0.5rem;
+  color: #215c21;
+  font-size: 1.1rem;
+}
+
+.consulta-card {
+  background: #f7fff7;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(144,238,144,0.06);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.consulta-status-row,
+.consulta-horario-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.consulta-select,
+.consulta-input {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-size: 1rem;
+  background: #fff;
+  min-width: 180px;
+}
+
+.prescricao-pdfs {
+  margin-top: 1rem;
+}
+
+.prescricao-pdf-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pdf-link {
+  color: #215c21;
+  background: #d0ffd0;
+  padding: 0.2rem 0.7rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.pdf-link:hover {
+  background: #90ee90;
+}
+
+.detalhes-btn {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.2s;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.detalhes-btn:hover {
+  background: #1565c0;
 }
 
 @media (max-width: 900px) {

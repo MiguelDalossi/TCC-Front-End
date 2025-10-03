@@ -49,3 +49,7 @@ export function logout() {
 export function isAuthenticated() {
   return Boolean(localStorage.getItem("auth_token"));
 }
+
+export async function getMe() {
+  return api.get("/auth/me").then(res => res.data);
+}

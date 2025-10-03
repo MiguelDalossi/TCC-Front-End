@@ -27,6 +27,9 @@ export default function MedicoForm() {
     telefone: "",
     email: "",
     crm: "",
+    uf: "",
+    cpf: "",
+    password: "",
   });
 
   React.useEffect(() => {
@@ -37,6 +40,9 @@ export default function MedicoForm() {
       telefone: existente.telefone || "",
       email: existente.email || "",
       crm: existente.crm || "",
+      uf: existente.uf || "",
+      cpf: existente.cpf || "",
+      password: "", // nunca preenche a senha ao editar
     });
   }, [existente]);
 
@@ -102,7 +108,7 @@ export default function MedicoForm() {
           />
         </div>
 
-        <div className="form-row">
+        <div className="form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
           <div className="form-group">
             <label>CRM</label>
             <input
@@ -110,8 +116,34 @@ export default function MedicoForm() {
               value={form.crm}
               onChange={onChange}
               placeholder="CRM"
+              required
             />
           </div>
+          <div className="form-group">
+            <label>UF</label>
+            <input
+              name="uf"
+              value={form.uf}
+              onChange={onChange}
+              placeholder="UF"
+              maxLength={2}
+              style={{ textTransform: "uppercase" }}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>CPF</label>
+            <input
+              name="cpf"
+              value={form.cpf}
+              onChange={onChange}
+              placeholder="CPF"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div className="form-group">
             <label>Telefone</label>
             <input
@@ -129,9 +161,24 @@ export default function MedicoForm() {
               value={form.email}
               onChange={onChange}
               placeholder="exemplo@dominio.com"
+              required
             />
           </div>
         </div>
+
+        {!isEdit && (
+          <div className="form-group">
+            <label>Senha para acesso *</label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={onChange}
+              placeholder="Senha do médico"
+              required
+            />
+          </div>
+        )}
 
         <div className="form-actions">
           <button
