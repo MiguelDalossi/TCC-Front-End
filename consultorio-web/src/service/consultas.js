@@ -4,14 +4,22 @@ import api from "./api";
 /** Normaliza datas (Date | 'YYYY-MM-DD' | 'YYYY-MM-DDTHH:mm' → ISO) */
 function toIso(dt) {
   if (!dt) return null;
+  // Se já está no formato local, retorna como está
   if (typeof dt === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dt)) {
-    return new Date(dt).toISOString();
+    return dt;
   }
   if (typeof dt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dt)) {
-    return new Date(dt + "T00:00:00").toISOString();
+    return dt + "T00:00";
   }
   try {
-    return new Date(dt).toISOString();
+    // Não converte para UTC, retorna local
+    const d = new Date(dt);
+    const yyyy = d.getFullYear();
+    const MM = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
   } catch {
     return dt;
   }
@@ -40,19 +48,41 @@ export async function criarConsulta({ pacienteId, medicoId, inicio, fim }) {
   return api.post("/consultas", payload);
 }
 
-/** PATCH /api/consultas/{id}/status → { status } (Agendada|EmAndamento|Concluida|Cancelada) */
+/** PATCH /api/consultas/{id}/status → { Status } (Agendada|EmAndamento|Concluida|Cancelada) */
 export async function atualizarStatus(id, status) {
   // status deve ser: "Agendada", "EmAndamento", "Concluida", "Cancelada"
   return api.patch(`/consultas/${id}/status`, { Status: status });
 }
 
-/** PUT /api/consultas/{id}/horario → { inicio, fim } */
-export async function atualizarHorario(id, { inicio, fim }) {
-  const payload = { inicio: toIso(inicio), fim: toIso(fim) };
-  return api.put(`/consultas/${id}/horario`, payload);
+/** PUT /api/consultas/{id} → Atualiza todos os dados da consulta */
+export async function atualizarConsultaCompleta(id, { inicio, fim, status, prontuario, prescricoes }) {
+  const payload = {
+    Inicio: toIso(inicio),
+    Fim: toIso(fim),
+    Status: status,
+    Prontuario: prontuario,
+    Prescricoes: prescricoes,
+  };
+  return api.put(`/consultas/${id}`, payload);
 }
 
 /** DELETE /api/consultas/{id} */
 export async function excluirConsulta(id) {
   return api.delete(`/consultas/${id}`);
 }
+
+/** PATCH /api/consultas/{id}/horario → Atualiza horário da consulta */
+export async function atualizarHorario(id, { inicio, fim }) {
+  const payload = {
+    Inicio: toIso(inicio),
+    Fim: toIso(fim),
+  };
+  return api.patch(`/consultas/${id}/horario`, payload);
+}
+
+/** GET /api/consultas?pacienteId={pacienteId} → ConsultaListDto[] por paciente */
+export async function listarConsultasPorPaciente(pacienteId) {
+  const { data } = await api.get("/consultas", { params: { pacienteId } });
+  return data;
+}
+

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../../components/Loader";
@@ -10,8 +10,9 @@ import {
 import { upsertProntuario } from "../../service/prontuarios.js";
 import {
   upsertPrescricoes,
-  obterPrescricaoPdfUrl,
+  baixarPrescricaoPdf,
 } from "../../service/prescricoes.js";
+import { baixarProntuarioPdf } from "../../service/prontuarios.js";
 
 const STATUS_OPTS = [
   { value: "Agendada", label: "🗓️ Agendada" },
@@ -20,7 +21,17 @@ const STATUS_OPTS = [
   { value: "Cancelada", label: "❌ Cancelada" },
 ];
 
+// Mapeamento do status para enum numérico
+const STATUS_ENUM = {
+  Agendada: 0,
+  EmAndamento: 1,
+  Concluida: 2,
+  Cancelada: 3,
+};
+
 export default function ConsultaDetalhe() {
+  const [showProntDetalhes, setShowProntDetalhes] = useState(false);
+
   const { id } = useParams();
   const qc = useQueryClient();
 
@@ -32,6 +43,21 @@ export default function ConsultaDetalhe() {
 
   const [status, setStatus] = useState(STATUS_OPTS[0].value);
   const [horario, setHorario] = useState({ inicio: "", fim: "" });
+
+  // Preenche fim automaticamente ao alterar início
+  useEffect(() => {
+    if (horario.inicio) {
+      const dt = new Date(horario.inicio);
+      dt.setMinutes(dt.getMinutes() + 30);
+      const yyyy = dt.getFullYear();
+      const MM = String(dt.getMonth() + 1).padStart(2, "0");
+      const dd = String(dt.getDate()).padStart(2, "0");
+      const hh = String(dt.getHours()).padStart(2, "0");
+      const mm = String(dt.getMinutes()).padStart(2, "0");
+      const fim = `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
+      setHorario((h) => ({ ...h, fim }));
+    }
+  }, [horario.inicio]);
 
   const prontInicial = useMemo(
     () => ({
@@ -52,27 +78,35 @@ export default function ConsultaDetalhe() {
       : [{ medicamento: "", posologia: "", orientacoes: "" }]
   );
 
+  // Atualiza status (PATCH) -- agora envia número
   const mutStatus = useMutation({
-    mutationFn: () => atualizarStatus(id, status),
+    mutationFn: () => atualizarStatus(id, STATUS_ENUM[status]),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
+  // Atualiza horário (PATCH)
   const mutHorario = useMutation({
-    mutationFn: () => atualizarHorario(id, horario),
+    mutationFn: () =>
+      atualizarHorario(id, {
+        inicio: horario.inicio,
+        fim: horario.fim,
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
+  // Atualiza prontuário (POST)
   const mutPront = useMutation({
     mutationFn: () => upsertProntuario(id, pront),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
+  // Atualiza prescrições (POST)
   const mutRx = useMutation({
     mutationFn: () => upsertPrescricoes(id, itensRx),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!data) return;
     setStatus(data.status || STATUS_OPTS[0].value);
     setHorario({
@@ -86,6 +120,23 @@ export default function ConsultaDetalhe() {
         : [{ medicamento: "", posologia: "", orientacoes: "" }]
     );
   }, [data, prontInicial]);
+
+  async function handleAbrirPdfProntuario() {
+    const blob = await baixarProntuarioPdf(data.id);
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  }
+
+  async function handleAbrirPdfPrescricao(consultaId, itemId) {
+    try {
+      const blob = await baixarPrescricaoPdf(consultaId, itemId);
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (err) {
+      alert("Erro ao baixar PDF da prescrição.");
+      console.error(err);
+    }
+  }
 
   if (isLoading) return <Loader message="Carregando consulta..." />;
   if (isError || !data)
@@ -172,6 +223,70 @@ export default function ConsultaDetalhe() {
           {mutPront.isPending ? "Salvando..." : "Salvar prontuário"}
         </button>
         {mutPront.isError && <div className="text-red-600">Erro ao salvar prontuário</div>}
+
+        {/* Lista de prontuários (apenas queixa principal e hipótese diagnóstica) */}
+        {!!data.prontuario && (
+          <div className="prontuario-list mt-4">
+            <div className="prontuario-item flex items-center justify-between py-2">
+              <span>
+                <strong>{data.prontuario.queixaPrincipal}</strong>
+                {" — "}
+                {data.prontuario.hipotesesDiagnosticas}
+              </span>
+              <div style={{ display: "flex", gap: "8px" }}>
+                {/* Botão PDF Prontuário */}
+                <button
+                  className="pdf-link"
+                  style={{
+                    background: "#c6f6d5",
+                    borderRadius: 6,
+                    padding: "0.4rem 1.2rem",
+                    fontWeight: 600,
+                  }}
+                  onClick={handleAbrirPdfProntuario}
+                >
+                  PDF
+                </button>
+                {/* Botão Detalhes */}
+                <button
+                  className="pdf-link"
+                  style={{
+                    background: "#bee3f8",
+                    borderRadius: 6,
+                    padding: "0.4rem 1.2rem",
+                    fontWeight: 600,
+                  }}
+                  onClick={() => setShowProntDetalhes(true)}
+                >
+                  Detalhes
+                </button>
+              </div>
+            </div>
+            {/* Modal de detalhes do prontuário */}
+            {showProntDetalhes && (
+              <div className="pront-modal-bg">
+                <div className="pront-modal">
+                  <h3>Detalhes do Prontuário</h3>
+                  <ul style={{ margin: "1rem 0" }}>
+                    <li><strong>Queixa Principal:</strong> {data.prontuario.queixaPrincipal}</li>
+                    <li><strong>HDA:</strong> {data.prontuario.hda}</li>
+                    <li><strong>Antecedentes:</strong> {data.prontuario.antecedentes}</li>
+                    <li><strong>Exame Físico:</strong> {data.prontuario.exameFisico}</li>
+                    <li><strong>Hipóteses Diagnósticas:</strong> {data.prontuario.hipotesesDiagnosticas}</li>
+                    <li><strong>Conduta:</strong> {data.prontuario.conduta}</li>
+                  </ul>
+                  <button
+                    className="btn-salvar"
+                    onClick={() => setShowProntDetalhes(false)}
+                    style={{ marginTop: 8 }}
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Prescrição */}
@@ -195,14 +310,18 @@ export default function ConsultaDetalhe() {
                   {rx.orientacoes ? ` · ${rx.orientacoes}` : ""}
                 </span>
                 {rx.id ? (
-                  <a
+                  <button
                     className="pdf-link"
-                    href={obterPrescricaoPdfUrl(rx.id)}
-                    target="_blank"
-                    rel="noreferrer"
+                    style={{
+                      background: "#c6f6d5",
+                      borderRadius: 6,
+                      padding: "0.4rem 1.2rem",
+                      fontWeight: 600,
+                    }}
+                    onClick={() => handleAbrirPdfPrescricao(data.id, rx.id)}
                   >
                     PDF
-                  </a>
+                  </button>
                 ) : null}
               </div>
             ))}
@@ -333,3 +452,6 @@ function toLocalInput(isoString) {
     return "";
   }
 }
+
+
+

@@ -7,11 +7,19 @@ import api from "./api";
  * Body: { itens: [{ medicamento, posologia, orientacoes? }, ...] }
  */
 export async function upsertPrescricoes(consultaId, itens) {
-  const safeItens = (itens || []).map((x) => ({
-    medicamento: (x.medicamento || "").trim(),
-    posologia: (x.posologia || "").trim(),
-    orientacoes: x.orientacoes?.trim() || null,
-  }));
+  // Validação básica: todos os itens devem ter medicamento e posologia
+  const safeItens = (itens || [])
+    .map((x) => ({
+      medicamento: (x.medicamento || "").trim(),
+      posologia: (x.posologia || "").trim(),
+      orientacoes: x.orientacoes?.trim() || null,
+    }))
+    .filter((x) => x.medicamento && x.posologia);
+
+  if (safeItens.length === 0) {
+    throw new Error("Adicione pelo menos um item de prescrição com medicamento e posologia.");
+  }
+
   return api.post(`/prescricoes/${consultaId}`, { itens: safeItens });
 }
 
@@ -22,17 +30,14 @@ export async function excluirPrescricao(prescricaoId) {
   return api.delete(`/prescricoes/${prescricaoId}`);
 }
 
-/** URL do PDF de uma prescrição específica (para <a href=... target="_blank">)
- * Geralmente: GET /api/prescricoes/{prescricaoId}/pdf → application/pdf
- */
-export function obterPrescricaoPdfUrl(prescricaoId) {
-  // VITE_API_URL já tem /api no final → mantemos o padrão
-  return `${import.meta.env.VITE_API_URL}/prescricoes/${prescricaoId}/pdf`;
+/** URL do PDF de uma prescrição específica */
+export function obterPrescricaoPdfUrl(consultaId, itemId) {
+  return `${import.meta.env.VITE_API_URL}/prescricoes/${consultaId}/pdf/${itemId}`;
 }
 
 /** Download do PDF (caso queira salvar/abrir via Blob programaticamente) */
-export async function baixarPrescricaoPdf(prescricaoId) {
-  const res = await api.get(`/prescricoes/${prescricaoId}/pdf`, {
+export async function baixarPrescricaoPdf(consultaId, itemId) {
+  const res = await api.get(`/prescricoes/${consultaId}/pdf/${itemId}`, {
     responseType: "blob",
   });
   return res.data; // Blob

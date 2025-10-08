@@ -269,7 +269,11 @@ export default function PacienteForm() {
         </div>
 
         {(mutSave.isError || mutDelete.isError) && (
-          <p className="text-red-600 text-sm">Ocorreu um erro. Tente novamente.</p>
+          <p className="text-red-600 text-sm">
+            {mutDelete.error?.response?.status === 409
+              ? "Não é possível excluir o paciente: só é permitido se todas as consultas estiverem canceladas e não houver outras consultas ativas. Consultas médicas devem ser mantidas conforme a LGPD."
+              : "Ocorreu um erro. Tente novamente."}
+          </p>
         )}
       </form>
     </div>

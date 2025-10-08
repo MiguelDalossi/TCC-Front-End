@@ -104,6 +104,7 @@ li {
 .consultas-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .consulta-item {
@@ -113,6 +114,16 @@ li {
   font-size: 1.1rem;
   font-weight: 500;
   box-shadow: 0 1px 4px rgba(144,238,144,0.08);
+}
+
+.consulta-item:focus-within,
+.consulta-item:hover {
+  background: #eaffea;
+  box-shadow: 0 2px 8px #90ee90a0;
+}
+
+.consulta-item .detalhes-btn:focus {
+  outline: 2px solid #1976d2;
 }
 
 .consulta-vazia {
@@ -483,6 +494,50 @@ li {
   background: #1565c0;
 }
 
+/* Modal de detalhes do prontuário */
+.pront-modal-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.pront-modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  min-width: 320px;
+  box-shadow: 0 2px 16px #0002;
+}
+.pront-modal h3 {
+  margin-top: 0;
+  color: #215c21;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.pront-modal ul {
+  list-style: none;
+  padding: 0;
+}
+.pront-modal li {
+  margin-bottom: 0.7rem;
+  font-size: 1.05rem;
+}
+
+/* Lista de prontuários abaixo do formulário */
+.prontuario-list {
+  margin-top: 1rem;
+}
+.prontuario-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
 @media (max-width: 900px) {
   .header-content {
     flex-direction: column;
@@ -526,4 +581,11 @@ li {
   .login-title {
     font-size: 1.2rem;
   }
+}
+
+.user-drawer:focus {
+  outline: 2px solid #1976d2;
+}
+.user-btn:focus {
+  outline: 2px solid #1976d2;
 }
