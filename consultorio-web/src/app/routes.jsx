@@ -7,6 +7,7 @@ import Shell from "./Shell";
 // Páginas
 import Login from "../pages/auth/Login";
 import Dashboard from "../pages/Dashboard";
+import RegisterUser from "../pages/auth/RegisterUser";
 
 // Pacientes  
 import PacientesList from "../pages/pacientes/PacientesList";
@@ -26,7 +27,8 @@ import MedicoDetails from "../pages/medicos/MedicoDetails";
 
 // Usuário
 import MePage from "../pages/auth/MePage";
-
+import FinanceiroDetalhe from "../pages/financeiro/FinanceiroDetalhe";
+import FinanceiroList from "../pages/financeiro/FinanceiroList"; // adicione este import
 
 
 /**
@@ -65,6 +67,9 @@ export default function AppRoutes() {
 
             {/* Usuário */}
             <Route path="/me" element={<MePage />} />
+            <Route path="/financeiro/:id" element={<FinanceiroDetalhe />} />
+            <Route path="/financeiro" element={<FinanceiroList />} /> // adicione esta linha
+            <Route path="/usuarios/novo" element={<RegisterUser />} />
           </Route>
         </Route>
 

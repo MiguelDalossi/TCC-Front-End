@@ -36,6 +36,8 @@ export async function criarPaciente(form) {
     telefone: form.telefone || null,
     email: form.email || null,
     observacoes: form.observacoes || null,
+    sexo: form.sexo || null,         // Novo campo
+    convenio: form.convenio || null, // Novo campo
     cidade: form.cidade || null,
     estado: form.estado || null,
     bairro: form.bairro || null,
@@ -56,6 +58,8 @@ export async function atualizarPaciente(id, form) {
     telefone: form.telefone || null,
     email: form.email || null,
     observacoes: form.observacoes || null,
+    sexo: form.sexo || null,         // Novo campo
+    convenio: form.convenio || null, // Novo campo
     cidade: form.cidade || null,
     estado: form.estado || null,
     bairro: form.bairro || null,

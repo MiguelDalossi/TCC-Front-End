@@ -1,6 +1,16 @@
 // src/service/consulta.js
 import api from "./api";
 
+/** PATCH /api/consultas/{id}/pagamento → Atualiza status de pagamento */
+export async function atualizarStatusPagamento(id, statusPagamento) {
+  // Envie o número puro (0, 1 ou 2) como body
+  return api.patch(
+    `/consultas/${id}/pagamento`,
+    statusPagamento,
+    { headers: { "Content-Type": "application/json" } }
+  );
+}
+
 /** Normaliza datas (Date | 'YYYY-MM-DD' | 'YYYY-MM-DDTHH:mm' → ISO) */
 function toIso(dt) {
   if (!dt) return null;
@@ -38,12 +48,27 @@ export async function obterConsulta(id) {
 }
 
 /** POST /api/consultas → ConsultaCreateDto */
-export async function criarConsulta({ pacienteId, medicoId, inicio, fim }) {
+export async function criarConsulta({
+  pacienteId,
+  medicoId,
+  inicio,
+  fim,
+  tipoAtendimento,
+  valorConsulta,
+  convenio,
+  numeroCarteirinha,
+  guiaConvenio
+}) {
   const payload = {
     pacienteId,
     medicoId,
     inicio: toIso(inicio),
     fim: toIso(fim),
+    tipoAtendimento: Number(tipoAtendimento),
+    valorConsulta: valorConsulta ? Number(valorConsulta) : 0,
+    convenio: convenio ?? null,
+    numeroCarteirinha: numeroCarteirinha ?? null,
+    guiaConvenio: guiaConvenio ?? null,
   };
   return api.post("/consultas", payload);
 }

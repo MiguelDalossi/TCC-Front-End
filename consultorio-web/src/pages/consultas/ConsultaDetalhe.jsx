@@ -6,6 +6,7 @@ import {
   obterConsulta,
   atualizarStatus,
   atualizarHorario,
+  atualizarStatusPagamento,
 } from "../../service/consultas.js";
 import { upsertProntuario } from "../../service/prontuarios.js";
 import {
@@ -29,6 +30,13 @@ const STATUS_ENUM = {
   Cancelada: 3,
 };
 
+// Adicione antes do export default function ConsultaDetalhe()
+const TIPO_ATENDIMENTO_LABEL = {
+  0: "Particular",
+  1: "Convênio",
+  2: "Telemedicina"
+};
+
 export default function ConsultaDetalhe() {
   const [showProntDetalhes, setShowProntDetalhes] = useState(false);
 
@@ -43,6 +51,7 @@ export default function ConsultaDetalhe() {
 
   const [status, setStatus] = useState(STATUS_OPTS[0].value);
   const [horario, setHorario] = useState({ inicio: "", fim: "" });
+  const [statusPagamento, setStatusPagamento] = useState(0);
 
   // Preenche fim automaticamente ao alterar início
   useEffect(() => {
@@ -106,6 +115,14 @@ export default function ConsultaDetalhe() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
   });
 
+  // Atualiza status de pagamento (PATCH)
+  const mutPagamento = useMutation({
+    mutationFn: async () => {
+      return await atualizarStatusPagamento(id, statusPagamento);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["consulta", id] }),
+  });
+
   useEffect(() => {
     if (!data) return;
     setStatus(data.status || STATUS_OPTS[0].value);
@@ -119,6 +136,7 @@ export default function ConsultaDetalhe() {
         ? data.prescricoes
         : [{ medicamento: "", posologia: "", orientacoes: "" }]
     );
+    setStatusPagamento(data.statusPagamento || 0);
   }, [data, prontInicial]);
 
   async function handleAbrirPdfProntuario() {
@@ -327,6 +345,55 @@ export default function ConsultaDetalhe() {
             ))}
           </div>
         )}
+      </section>
+
+      {/* Status de Pagamento e Dados Financeiros */}
+      <section className="consulta-card">
+        <h2>💰 Financeiro</h2>
+        <div className="consulta-status-pagamento" style={{ display: "flex", flexWrap: "wrap", gap: "2rem" }}>
+          <div>
+            <strong>Tipo de Atendimento:</strong><br />
+            {TIPO_ATENDIMENTO_LABEL[data.tipoAtendimento] || "-"}
+          </div>
+          <div>
+            <strong>Valor da Consulta:</strong><br />
+            {data.valorConsulta !== undefined && data.valorConsulta !== null
+              ? `R$ ${Number(data.valorConsulta).toFixed(2)}`
+              : "-"}
+          </div>
+          {Number(data.tipoAtendimento) === 1 && (
+            <>
+              <div>
+                <strong>Nº Carteirinha:</strong><br />
+                {data.numeroCarteirinha || "-"}
+              </div>
+              <div>
+                <strong>Guia Convênio:</strong><br />
+                {data.guiaConvenio || "-"}
+              </div>
+            </>
+          )}
+          <div>
+            <strong>Status Pagamento:</strong><br />
+            <select
+              value={statusPagamento}
+              onChange={e => setStatusPagamento(Number(e.target.value))}
+            >
+              <option value={0}>Não Pago</option>
+              <option value={1}>Pago</option>
+              <option value={2}>Em Processo</option>
+            </select>
+            <button
+              onClick={() => mutPagamento.mutate()}
+              className="btn-salvar"
+              disabled={mutPagamento.isPending}
+              style={{ marginLeft: 8 }}
+            >
+              {mutPagamento.isPending ? "Atualizando..." : "Atualizar pagamento"}
+            </button>
+            {mutPagamento.isError && <div className="text-red-600">Erro ao salvar status de pagamento</div>}
+          </div>
+        </div>
       </section>
     </div>
   );

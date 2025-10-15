@@ -29,6 +29,10 @@ export default function Header() {
             <Link to="/pacientes" className="nav-link">Pacientes</Link>
             <Link to="/medicos" className="nav-link">Médicos</Link>
             <Link to="/consultas" className="nav-link">Consultas</Link>
+            <Link to="/financeiro" className="nav-link">Financeiro</Link> {/* <-- Adicione esta linha */}
+            {user?.role === "Admin" && (
+              <Link to="/usuarios/novo" className="nav-link">Cadastrar</Link>
+            )}
             <button className="logout-btn" onClick={handleLogout}>Sair</button>
             <button
               className="user-btn"

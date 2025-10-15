@@ -54,7 +54,14 @@ export default function PacienteDetails() {
               <th>Email</th>
               <td>{paciente.email || "-"}</td>
             </tr>
-            {/* Removido campo Endereço */}
+            <tr>
+              <th>Sexo</th>
+              <td>{paciente.sexo || "-"}</td>
+            </tr>
+            <tr>
+              <th>Convênio</th>
+              <td>{paciente.convenio || "Sem convênio"}</td>
+            </tr>
             <tr>
               <th>Cidade</th>
               <td>{paciente.cidade || "-"}</td>

@@ -10,6 +10,13 @@ import {
 import { buscarEnderecoPorCep } from "../../service/viacep";
 import Loader from "../../components/Loader";
 
+const CONVENIOS = [
+  { value: "Sem Convenio", label: "Sem convênio" },
+  { value: "Unimed", label: "Unimed" },
+  { value: "Apas", label: "Apas" },
+  { value: "AME", label: "AME" }
+];
+
 export default function PacienteForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
@@ -29,6 +36,8 @@ export default function PacienteForm() {
     telefone: "",
     email: "",
     observacoes: "",
+    sexo: "",         // Novo campo
+    convenio: "",     // Novo campo
     cidade: "",
     estado: "",
     bairro: "",
@@ -47,6 +56,8 @@ export default function PacienteForm() {
       telefone: existente.telefone || "",
       email: existente.email || "",
       observacoes: existente.observacoes || "",
+      sexo: existente.sexo || "",         // Novo campo
+      convenio: existente.convenio || "", // Novo campo
       cidade: existente.cidade || "",
       estado: existente.estado || "",
       bairro: existente.bairro || "",
@@ -178,6 +189,47 @@ export default function PacienteForm() {
             onChange={onChange}
             rows={3}
           />
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Sexo</label>
+            <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+              <label>
+                <input
+                  type="radio"
+                  name="sexo"
+                  value="Masculino"
+                  checked={form.sexo === "Masculino"}
+                  onChange={onChange}
+                  required
+                /> Masculino
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="sexo"
+                  value="Feminino"
+                  checked={form.sexo === "Feminino"}
+                  onChange={onChange}
+                  required
+                /> Feminino
+              </label>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Convênio</label>
+            <select
+              name="convenio"
+              value={form.convenio}
+              onChange={onChange}
+              required
+            >
+              {CONVENIOS.map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="form-group">
